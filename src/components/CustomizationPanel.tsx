@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Wand2,
   Layers,
+  RotateCcw,
+  Check,
 } from 'lucide-react';
 import { QRConfig, ExportResolution } from '../types';
 import { PRESET_MESSAGES } from '../utils/presets';
@@ -23,6 +25,7 @@ interface CustomizationPanelProps {
   customWidth: number;
   customHeight: number;
   onChangeCustomDimensions: (w: number, h: number) => void;
+  onResetDefault?: () => void;
 }
 
 type TabType = 'message' | 'colors' | 'layout' | 'logo' | 'export';
@@ -35,8 +38,10 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   customWidth,
   customHeight,
   onChangeCustomDimensions,
+  onResetDefault,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('message');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const scannability = checkScannability(
     config.qrColor,
@@ -44,6 +49,14 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     config.textColor,
     config.isTransparentBg && !config.hasCardContainer
   );
+
+  const handleResetClick = () => {
+    if (onResetDefault) {
+      onResetDefault();
+      setResetSuccess(true);
+      setTimeout(() => setResetSuccess(false), 2000);
+    }
+  };
 
   const handleAutoFixContrast = () => {
     if (config.isTransparentBg) {
@@ -66,7 +79,7 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
       {/* Header & Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-red-50 text-red-600 border border-red-100">
             <Sliders className="w-4 h-4" />
@@ -80,6 +93,33 @@ export const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </p>
           </div>
         </div>
+
+        {/* Restore Defaults Button */}
+        {onResetDefault && (
+          <button
+            type="button"
+            id="btn-restore-defaults"
+            onClick={handleResetClick}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all active:scale-95 shadow-2xs self-start sm:self-auto ${
+              resetSuccess
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                : 'bg-slate-50 hover:bg-red-50 border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600'
+            }`}
+            title="Restaura todas as cores, tamanhos, fontes e estilos para a configuração padrão original"
+          >
+            {resetSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Padrão Restaurado!</span>
+              </>
+            ) : (
+              <>
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Restaurar Padrão</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Navigation tabs */}

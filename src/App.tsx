@@ -156,6 +156,20 @@ export default function App() {
     setConfig(savedConfig);
   };
 
+  const handleResetToDefault = () => {
+    setConfig((prev) => ({
+      ...DEFAULT_CONFIG,
+      rawUrl: prev.rawUrl,
+      targetUrl: prev.targetUrl,
+      channelName: prev.channelName,
+      subMessage: prev.subMessage,
+      addSubscribeParam: prev.addSubscribeParam,
+    }));
+    setExportResolution('2000');
+    setCustomWidth(2000);
+    setCustomHeight(2000);
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
       {/* Top Header Navigation */}
@@ -201,6 +215,7 @@ export default function App() {
                 setCustomWidth(w);
                 setCustomHeight(h);
               }}
+              onResetDefault={handleResetToDefault}
             />
           </section>
 
